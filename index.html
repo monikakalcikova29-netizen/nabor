@@ -151,7 +151,7 @@
             btn.textContent = 'Načítám...';
 
             try {
-                const res = await fetch('/.netlify/functions/generate-suggestions', {
+                const res = await fetch('/api/generate-suggestions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pozice: formData.pozice, pole: fieldLabel })
@@ -197,7 +197,7 @@
             }).filter(Boolean).join('\n');
 
             try {
-                const res = await fetch('/.netlify/functions/generate-analysis', {
+                const res = await fetch('/api/generate-analysis', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data })
