@@ -1,13 +1,17 @@
-exports.handler = async (event) => {
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
+
     try {
-        const { pozice, pole } = JSON.parse(event.body);
+        const { pozice, pole } = req.body;
         const apiKey = process.env.ANTHROPIC_API_KEY;
 
         if (!apiKey) {
             throw new Error('Chybí ANTHROPIC_API_KEY');
         }
 
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,9 +28,9 @@ exports.handler = async (event) => {
             })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (!res.ok) {
+        if (!response.ok) {
             console.error(data);
             throw new Error(data.error?.message || 'API error');
         }
@@ -37,18 +41,10 @@ exports.handler = async (event) => {
             .filter(s => s.length > 0)
             .slice(0, 3) || [];
 
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ suggestions })
-        };
+        return res.status(200).json({ suggestions });
 
     } catch (e) {
         console.error(e);
-        return {
-            statusCode: 500,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: e.message })
-        };
+        return res.status(500).json({ error: e.message });
     }
-};
+}
